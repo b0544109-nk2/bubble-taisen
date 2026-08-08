@@ -128,6 +128,13 @@
   .mclose{font-family:inherit;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px 18px;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
   #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:60;background:var(--ink);color:#fff;font-weight:800;font-size:.9rem;padding:12px 20px;border-radius:999px;box-shadow:4px 4px 0 rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (max-width:480px){
+    .wrap{padding-left:10px;padding-right:10px}
+    th,td{padding:9px 5px;font-size:.9rem}
+    thead th{font-size:.64rem;letter-spacing:.03em}
+    .tag{padding:5px 8px;font-size:.76rem}
+    .pts{font-size:1rem}
+  }
 </style>
 </head>
 <body>
@@ -264,15 +271,15 @@ function render(teams, matches){
   var anyPlayed = arr.some(function(x){return x.played>0;});
   var medals=["🥇","🥈","🥉"];
   var h='<table><thead><tr><th class="rank">#</th><th class="name">チーム</th>'
-       +'<th>勝</th><th>分</th><th>負</th><th>得</th><th>失</th><th>差</th><th>勝点</th></tr></thead><tbody>';
+       +'<th>勝点</th><th>勝</th><th>分</th><th>負</th><th>得</th><th>失</th><th>差</th></tr></thead><tbody>';
   arr.forEach(function(x,i){
     var rankCell = (anyPlayed && i<3) ? '<span class="medal">'+medals[i]+'</span>' : (i+1);
     var dcls = x.gd>0?'diff-pos':(x.gd<0?'diff-neg':'');
     h+='<tr class="'+(anyPlayed&&i===0?'top1':'')+'"><td class="rank">'+rankCell+'</td>'
       +'<td class="name">'+pill(x.sym,x.name)+'</td>'
+      +'<td class="pts">'+x.pts+'</td>'
       +'<td>'+x.w+'</td><td>'+x.d+'</td><td>'+x.l+'</td>'
-      +'<td>'+x.gf+'</td><td>'+x.ga+'</td><td class="'+dcls+'">'+(x.gd>0?'+':'')+x.gd+'</td>'
-      +'<td class="pts">'+x.pts+'</td></tr>';
+      +'<td>'+x.gf+'</td><td>'+x.ga+'</td><td class="'+dcls+'">'+(x.gd>0?'+':'')+x.gd+'</td></tr>';
   });
   h+='</tbody></table>';
   document.getElementById("rankBox").innerHTML=h;
@@ -343,7 +350,7 @@ function openTweet(sym){
 }
 function rr(x,rx,ry,w,h,r){ if(x.roundRect){x.beginPath();x.roundRect(rx,ry,w,h,r);return;} x.beginPath();x.moveTo(rx+r,ry);x.arcTo(rx+w,ry,rx+w,ry+h,r);x.arcTo(rx+w,ry+h,rx,ry+h,r);x.arcTo(rx,ry+h,rx,ry,r);x.arcTo(rx,ry,rx+w,ry,r);x.closePath(); }
 function buildCanvas(sym){
-  var W=1000,H=1000, cv=document.createElement("canvas"); cv.width=W; cv.height=H; var x=cv.getContext("2d");
+  var W=1000,H=1200, cv=document.createElement("canvas"); cv.width=W; cv.height=H; var x=cv.getContext("2d");
   x.fillStyle="#fff3bf"; x.fillRect(0,0,W,H);
   x.fillStyle="rgba(51,196,255,.18)";
   for(var gy=24;gy<H;gy+=50){ for(var gx=((((gy/50)|0)%2)?49:24);gx<W;gx+=50){ x.beginPath(); x.arc(gx,gy,4,0,7); x.fill(); } }
@@ -360,15 +367,34 @@ function buildCanvas(sym){
   x.font='bold 34px "Yu Gothic UI",sans-serif'; x.fillStyle="#6a5a2a"; x.fillText("全"+LAST.standings.length+"チーム中",cx,522);
   x.fillStyle="#22252e"; x.font='bold 42px "Yu Gothic UI",sans-serif'; x.fillText("勝 "+s.w+"   分 "+s.d+"   負 "+s.l,cx,592);
   x.fillStyle="#e8503f"; x.font='bold 46px "Yu Gothic UI",sans-serif'; x.fillText("勝点 "+s.pts+"  ／  得失差 "+(s.gd>0?"+":"")+s.gd,cx,652);
-  x.textAlign="left"; var ly=724, lx=150;
+  // 勝敗表
+  x.textAlign="center"; x.fillStyle="#22252e"; x.font='bold 40px "Yu Gothic UI",sans-serif';
+  x.fillText("🏅 勝敗表",cx,700);
+  var colR=118,colTeam=168,colW=558,colD=632,colL=706,colP=832;
+  var headerY=752, firstCy=808, rh=66;
+  x.textBaseline="middle";
+  x.font='bold 26px "Yu Gothic UI",sans-serif'; x.fillStyle="#6a5a2a";
+  x.textAlign="center"; x.fillText("順位",colR,headerY);
+  x.textAlign="left"; x.fillText("チーム",colTeam,headerY);
+  x.textAlign="center"; x.fillText("勝",colW,headerY); x.fillText("分",colD,headerY); x.fillText("負",colL,headerY); x.fillText("勝点",colP,headerY);
+  x.strokeStyle="#22252e"; x.lineWidth=3; x.beginPath(); x.moveTo(90,headerY+22); x.lineTo(910,headerY+22); x.stroke();
   LAST.standings.forEach(function(tt,i){
-    var yy=ly+i*46;
-    x.fillStyle=TEAMCOLOR[tt.sym]||"#22252e"; rr(x,lx,yy-26,42,36,10); x.fill(); x.lineWidth=4; x.strokeStyle="#22252e"; x.stroke();
-    x.fillStyle="#fff"; x.textAlign="center"; x.font="bold 24px sans-serif"; x.fillText(tt.sym,lx+21,yy);
-    x.textAlign="left"; x.fillStyle="#22252e"; x.font='bold 28px "Yu Gothic UI",sans-serif';
-    var nm2=teamName(LAST.teams,tt.sym);
-    x.fillText((i+1)+"位  "+tt.sym+(nm2?(":"+nm2):"")+"   勝点"+tt.pts, lx+60, yy);
+    var cy=firstCy+i*rh;
+    if(tt.sym===sym){ x.fillStyle="#fff2c0"; rr(x,88,cy-rh/2+3,824,rh-6,10); x.fill(); }
+    var med = i<3 ? ["🥇","🥈","🥉"][i] : String(i+1);
+    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Yu Gothic UI",sans-serif'; x.fillText(med,colR,cy);
+    var nm2=teamName(LAST.teams,tt.sym); var lbl=tt.sym+(nm2?(":"+nm2):"");
+    x.font='bold 26px "Yu Gothic UI",sans-serif'; var pw=Math.min(372,x.measureText(lbl).width+26);
+    rr(x,colTeam,cy-22,pw,44,22); x.fillStyle=TEAMCOLOR[tt.sym]||"#22252e"; x.fill(); x.lineWidth=3; x.strokeStyle="#22252e"; x.stroke();
+    x.fillStyle="#fff"; x.textAlign="center"; x.fillText(lbl,colTeam+pw/2,cy+1);
+    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Yu Gothic UI",sans-serif';
+    x.fillText(String(tt.w),colW,cy); x.fillText(String(tt.d),colD,cy); x.fillText(String(tt.l),colL,cy);
+    x.fillStyle="#e8503f"; x.font='bold 32px "Yu Gothic UI",sans-serif'; x.fillText(String(tt.pts),colP,cy);
+    x.strokeStyle="#efe3b0"; x.lineWidth=2; x.beginPath(); x.moveTo(90,cy+rh/2); x.lineTo(910,cy+rh/2); x.stroke();
   });
+  x.textBaseline="alphabetic";
+  x.textAlign="center"; x.fillStyle="#8a7a3a"; x.font='bold 26px "Yu Gothic UI",sans-serif';
+  x.fillText("#ゆるふわっばぶるさっかー ⚽🫧", cx, 1132);
   return cv;
 }
 function downloadImage(sym){
