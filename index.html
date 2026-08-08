@@ -96,7 +96,7 @@ function parseCSV(text){
   if(cur!==""||row.length){ row.push(cur); rows.push(row); }
   return rows;
 }
-function num(v){ v=(v==null?"":String(v)).trim(); if(v==="") return null; var n=Number(v); return isNaN(n)?null:n; }
+function num(v){ v=(v==null?"":String(v)); v=v.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/　/g," ").trim(); if(v==="") return null; var n=Number(v); return isNaN(n)?null:n; }
 function esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 // 記号：チーム名 を色付きピルで表示
 function pill(sym,name){ var lbl = name ? esc(sym)+' '+esc(name) : esc(sym); return '<span class="tag '+esc(sym)+'">'+lbl+'</span>'; }
@@ -163,14 +163,14 @@ function render(teams, matches){
   h+='</tbody></table>';
   document.getElementById("rankBox").innerHTML=h;
 
-  var m='<table><thead><tr><th>#</th><th>時刻</th><th class="name">対戦</th><th>スコア</th></tr></thead><tbody>';
+  var m='<table><thead><tr><th>#</th><th class="name">対戦</th><th>スコア</th></tr></thead><tbody>';
   matches.forEach(function(x){
     var played=(x.hs!=null&&x.as!=null);
     var hw=played&&x.hs>x.as, aw=played&&x.as>x.hs;
     var score = played
       ? '<span class="score '+(hw?'win':'')+'">'+x.hs+'</span><span class="vs">-</span><span class="score '+(aw?'win':'')+'">'+x.as+'</span>'
       : '<span class="pending">未</span>';
-    m+='<tr><td>'+esc(x.no)+'</td><td>'+esc(x.time)+'</td>'
+    m+='<tr><td>'+esc(x.no)+'</td>'
       +'<td class="name">'+pill(x.home,teamName(teams,x.home))+' <span class="vs">vs</span> '+pill(x.away,teamName(teams,x.away))+'</td>'
       +'<td>'+score+'</td></tr>';
   });
