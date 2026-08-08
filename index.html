@@ -27,6 +27,7 @@
     background-size:34px 34px,34px 34px;
     background-position:0 0,17px 17px;
     -webkit-font-smoothing:antialiased;
+    font-synthesis:none;
   }
   /* 散りばめた絵文字クリップアート */
   .deco{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
@@ -360,24 +361,24 @@ function buildCanvas(sym){
   for(var gy=24;gy<H;gy+=50){ for(var gx=((((gy/50)|0)%2)?49:24);gx<W;gx+=50){ x.beginPath(); x.arc(gx,gy,4,0,7); x.fill(); } }
   var m=56; rr(x,m,m,W-2*m,H-2*m,40); x.fillStyle="#fff"; x.fill(); x.lineWidth=10; x.strokeStyle="#22252e"; x.stroke();
   var cx=W/2; x.textAlign="center"; x.fillStyle="#22252e";
-  x.font='bold 34px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("#ゆるふわっばぶるさっかー",cx,146);
-  x.font='bold 66px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("結果発表！🎉",cx,228);
+  x.font='34px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("#ゆるふわっばぶるさっかー",cx,146);
+  x.font='66px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("結果発表！🎉",cx,228);
   var nm=teamName(LAST.teams,sym); var label=sym+(nm?(":"+nm):""); var col=TEAMCOLOR[sym]||"#22252e";
-  x.font='bold 52px "Mochiy Pop One","Kosugi Maru",sans-serif'; var tw=x.measureText(label).width; var pw=tw+80,ph=88,px=cx-pw/2,py=278;
+  x.font='52px "Mochiy Pop One","Kosugi Maru",sans-serif'; var tw=x.measureText(label).width; var pw=tw+80,ph=88,px=cx-pw/2,py=278;
   rr(x,px,py,pw,ph,44); x.fillStyle=col; x.fill(); x.lineWidth=8; x.strokeStyle="#22252e"; x.stroke();
   x.fillStyle="#fff"; x.textBaseline="middle"; x.fillText(label,cx,py+ph/2+2); x.textBaseline="alphabetic";
   var s=findStanding(sym); var medal=s.rank<=3?["🥇","🥈","🥉"][s.rank-1]:"";
-  x.fillStyle="#22252e"; x.font='bold 92px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(medal+" "+s.rank+"位",cx,478);
-  x.font='bold 34px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillStyle="#6a5a2a"; x.fillText("全"+LAST.standings.length+"チーム中",cx,522);
-  x.fillStyle="#22252e"; x.font='bold 42px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("勝 "+s.w+"   分 "+s.d+"   負 "+s.l,cx,592);
-  x.fillStyle="#e8503f"; x.font='bold 46px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("勝点 "+s.pts+"  ／  得失差 "+(s.gd>0?"+":"")+s.gd,cx,652);
+  x.fillStyle="#22252e"; x.font='92px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(medal+" "+s.rank+"位",cx,478);
+  x.font='34px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillStyle="#6a5a2a"; x.fillText("全"+LAST.standings.length+"チーム中",cx,522);
+  x.fillStyle="#22252e"; x.font='42px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("勝 "+s.w+"   分 "+s.d+"   負 "+s.l,cx,592);
+  x.fillStyle="#e8503f"; x.font='46px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("勝点 "+s.pts+"  ／  得失差 "+(s.gd>0?"+":"")+s.gd,cx,652);
   // 勝敗表
-  x.textAlign="center"; x.fillStyle="#22252e"; x.font='bold 40px "Mochiy Pop One","Kosugi Maru",sans-serif';
+  x.textAlign="center"; x.fillStyle="#22252e"; x.font='40px "Mochiy Pop One","Kosugi Maru",sans-serif';
   x.fillText("🏅 勝敗表",cx,700);
   var colR=118,colTeam=168,colW=558,colD=632,colL=706,colP=832;
   var headerY=752, firstCy=808, rh=66;
   x.textBaseline="middle";
-  x.font='bold 26px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillStyle="#6a5a2a";
+  x.font='26px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillStyle="#6a5a2a";
   x.textAlign="center"; x.fillText("順位",colR,headerY);
   x.textAlign="left"; x.fillText("チーム",colTeam,headerY);
   x.textAlign="center"; x.fillText("勝",colW,headerY); x.fillText("分",colD,headerY); x.fillText("負",colL,headerY); x.fillText("勝点",colP,headerY);
@@ -386,18 +387,18 @@ function buildCanvas(sym){
     var cy=firstCy+i*rh;
     if(tt.sym===sym){ x.fillStyle="#fff2c0"; rr(x,88,cy-rh/2+3,824,rh-6,10); x.fill(); }
     var med = i<3 ? ["🥇","🥈","🥉"][i] : String(i+1);
-    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(med,colR,cy);
+    x.fillStyle="#22252e"; x.textAlign="center"; x.font='30px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(med,colR,cy);
     var nm2=teamName(LAST.teams,tt.sym); var lbl=tt.sym+(nm2?(":"+nm2):"");
-    x.font='bold 26px "Mochiy Pop One","Kosugi Maru",sans-serif'; var pw=Math.min(372,x.measureText(lbl).width+26);
+    x.font='26px "Mochiy Pop One","Kosugi Maru",sans-serif'; var pw=Math.min(372,x.measureText(lbl).width+26);
     rr(x,colTeam,cy-22,pw,44,22); x.fillStyle=TEAMCOLOR[tt.sym]||"#22252e"; x.fill(); x.lineWidth=3; x.strokeStyle="#22252e"; x.stroke();
     x.fillStyle="#fff"; x.textAlign="center"; x.fillText(lbl,colTeam+pw/2,cy+1);
-    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Mochiy Pop One","Kosugi Maru",sans-serif';
+    x.fillStyle="#22252e"; x.textAlign="center"; x.font='30px "Mochiy Pop One","Kosugi Maru",sans-serif';
     x.fillText(String(tt.w),colW,cy); x.fillText(String(tt.d),colD,cy); x.fillText(String(tt.l),colL,cy);
-    x.fillStyle="#e8503f"; x.font='bold 32px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(String(tt.pts),colP,cy);
+    x.fillStyle="#e8503f"; x.font='32px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(String(tt.pts),colP,cy);
     x.strokeStyle="#efe3b0"; x.lineWidth=2; x.beginPath(); x.moveTo(90,cy+rh/2); x.lineTo(910,cy+rh/2); x.stroke();
   });
   x.textBaseline="alphabetic";
-  x.textAlign="center"; x.fillStyle="#8a7a3a"; x.font='bold 26px "Mochiy Pop One","Kosugi Maru",sans-serif';
+  x.textAlign="center"; x.fillStyle="#8a7a3a"; x.font='26px "Mochiy Pop One","Kosugi Maru",sans-serif';
   x.fillText("#ゆるふわっばぶるさっかー ⚽🫧", cx, 1132);
   return cv;
 }
