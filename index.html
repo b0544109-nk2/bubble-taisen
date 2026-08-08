@@ -208,7 +208,7 @@ function parseCSV(text){
 function num(v){ v=(v==null?"":String(v)); v=v.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/　/g," ").trim(); if(v==="") return null; var n=Number(v); return isNaN(n)?null:n; }
 function esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 // 記号 + 半角スペース + チーム名（名前が空なら記号のみ）
-function pill(sym,name){ var lbl = name ? esc(sym)+' '+esc(name) : esc(sym); return '<span class="tag '+esc(sym)+'">'+lbl+'</span>'; }
+function pill(sym,name){ var lbl = name ? esc(sym)+':'+esc(name) : esc(sym); return '<span class="tag '+esc(sym)+'">'+lbl+'</span>'; }
 
 async function load(){
   try{
@@ -334,7 +334,7 @@ function doAction(sym){
 }
 function openTweet(sym){
   var s=findStanding(sym); if(!s) return;
-  var nm=teamName(LAST.teams,sym); var label=sym+(nm?(" "+nm):"");
+  var nm=teamName(LAST.teams,sym); var label=sym+(nm?(":"+nm):"");
   var medal=s.rank<=3?["🥇","🥈","🥉"][s.rank-1]:"";
   var text="【#ゆるふわっばぶるさっかー】\n"+label+" は "+s.rank+"位！"+medal+"\n勝"+s.w+" 分"+s.d+" 負"+s.l+"（勝点"+s.pts+"）⚽🫧";
   window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(text),"_blank","noopener");
@@ -349,7 +349,7 @@ function buildCanvas(sym){
   var cx=W/2; x.textAlign="center"; x.fillStyle="#22252e";
   x.font='bold 34px "Yu Gothic UI","Hiragino Maru Gothic ProN",sans-serif'; x.fillText("#ゆるふわっばぶるさっかー",cx,146);
   x.font='bold 66px "Yu Gothic UI","Hiragino Maru Gothic ProN",sans-serif'; x.fillText("結果発表！🎉",cx,228);
-  var nm=teamName(LAST.teams,sym); var label=sym+(nm?(" "+nm):""); var col=TEAMCOLOR[sym]||"#22252e";
+  var nm=teamName(LAST.teams,sym); var label=sym+(nm?(":"+nm):""); var col=TEAMCOLOR[sym]||"#22252e";
   x.font='bold 52px "Yu Gothic UI",sans-serif'; var tw=x.measureText(label).width; var pw=tw+80,ph=88,px=cx-pw/2,py=278;
   rr(x,px,py,pw,ph,44); x.fillStyle=col; x.fill(); x.lineWidth=8; x.strokeStyle="#22252e"; x.stroke();
   x.fillStyle="#fff"; x.textBaseline="middle"; x.fillText(label,cx,py+ph/2+2); x.textBaseline="alphabetic";
@@ -365,7 +365,7 @@ function buildCanvas(sym){
     x.fillStyle="#fff"; x.textAlign="center"; x.font="bold 24px sans-serif"; x.fillText(tt.sym,lx+21,yy);
     x.textAlign="left"; x.fillStyle="#22252e"; x.font='bold 28px "Yu Gothic UI",sans-serif';
     var nm2=teamName(LAST.teams,tt.sym);
-    x.fillText((i+1)+"位  "+tt.sym+(nm2?(" "+nm2):"")+"   勝点"+tt.pts, lx+60, yy);
+    x.fillText((i+1)+"位  "+tt.sym+(nm2?(":"+nm2):"")+"   勝点"+tt.pts, lx+60, yy);
   });
   return cv;
 }
