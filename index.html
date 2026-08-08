@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>バブルサッカー 対戦表</title>
+<style>
+  :root{
+    --bg:#0f1220; --card:#171a2b; --line:#2a2f45; --fg:#eef1ff; --muted:#a7adc9;
+    --accent:#5b8cff; --accent2:#37d39b; --warn:#ffcc33; --rowhi:#1e2340;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f6f7fb; --card:#ffffff; --line:#e3e6f0; --fg:#151a2e; --muted:#5b627e;
+           --accent:#2f6bff; --accent2:#0fa578; --warn:#c9880a; --rowhi:#eef2ff; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font-family:system-ui,-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:1.4rem;margin:6px 0 2px;letter-spacing:.02em}
+  .sub{color:var(--muted);font-size:.82rem;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        padding:14px 14px 6px;margin:14px 0;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+  .card h2{font-size:1.05rem;margin:2px 0 10px;display:flex;align-items:center;gap:8px}
+  .rule{color:var(--muted);font-size:.8rem;font-weight:400}
+  .tblwrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th,td{padding:9px 8px;text-align:center;border-bottom:1px solid var(--line);font-size:.92rem;white-space:nowrap}
+  th{color:var(--muted);font-weight:600;font-size:.78rem}
+  td.name,th.name{text-align:left;white-space:normal}
+  tbody tr:hover{background:var(--rowhi)}
+  .rank{font-weight:700;width:2.2em}
+  .pts{font-weight:800;color:var(--accent2)}
+  .tag{display:inline-block;min-width:1.6em;height:1.6em;line-height:1.6em;border-radius:6px;
+       font-weight:800;color:#fff;font-size:.82rem;text-align:center;padding:0 .3em}
+  .A{background:#e5484d}.B{background:#3b82f6}.C{background:#d9a400}
+  .D{background:#22a06b}.E{background:#8b5cf6}
+  .score{font-weight:800;font-size:1rem}
+  .vs{color:var(--muted);font-size:.75rem;padding:0 6px}
+  .pending{color:var(--muted)}
+  .foot{color:var(--muted);font-size:.75rem;text-align:center;margin-top:18px;line-height:1.6}
+  .status{font-size:.72rem;color:var(--muted);text-align:right;margin-top:6px}
+  .members{color:var(--muted);font-size:.8rem}
+  .err{color:#ff7b7b;font-size:.85rem;white-space:pre-wrap}
+  .win{color:var(--accent2);font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🫧 バブルサッカー 対戦表</h1>
+  <div class="sub" id="sub">読み込み中…</div>
+
+  <div class="card">
+    <h2>🏆 順位 <span class="rule" id="ruleNote"></span></h2>
+    <div class="tblwrap" id="rankBox"><div class="err" id="err"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>⚽ 試合</h2>
+    <div class="tblwrap" id="matchBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>👥 チーム</h2>
+    <div class="tblwrap" id="teamBox"></div>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="foot">主催者がスプレッドシートを更新すると、この画面も自動で反映されます（30秒ごと／再読み込みでも更新）。</div>
+</div>
+
+<script>
+// ?id=スプレッドシートID を付ければ別シートも表示できます。
+var DEFAULT_ID = "1kB5pikXCL43TlHcbg49HP_g8oWCwEy_o75i7y9A60jI";
+var params = new URLSearchParams(location.search);
+var SHEET_ID = params.get("id") || DEFAULT_ID;
+var GVIZ = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv";
+var SETTINGS = { win:3, draw:1, loss:0 };
+
+function parseCSV(text){
+  var rows=[], row=[], cur="", i=0, q=false, c;
+  while(i<text.length){
+    c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===',') { row.push(cur); cur=""; }
+      else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=""; }
+      else if(c==='\r'){ }
+      else cur+=c;
+    }
+    i++;
+  }
+  if(cur!==""||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function num(v){ v=(v==null?"":String(v)).trim(); if(v==="") return null; var n=Number(v); return isNaN(n)?null:n; }
+function esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+async function load(){
+  try{
+    var res = await fetch(GVIZ + "&_=" + Date.now());
+    if(!res.ok) throw new Error("シート取得に失敗 (HTTP " + res.status + ")。共有が『リンクを知っている全員: 閲覧者』か確認してください。");
+    var text = await res.text();
+    var rows = parseCSV(text);
+    var teams=[], matches=[];
+    SETTINGS = { win:3, draw:1, loss:0 };
+    for(var r=0;r<rows.length;r++){
+      var col = rows[r].map(function(x){return (x==null?"":String(x)).trim();});
+      var t = col[0];
+      if(t==="勝点勝") SETTINGS.win = (num(col[1])!=null?num(col[1]):3);
+      else if(t==="勝点分") SETTINGS.draw = (num(col[1])!=null?num(col[1]):1);
+      else if(t==="勝点負") SETTINGS.loss = (num(col[1])!=null?num(col[1]):0);
+      else if(t==="チーム") teams.push({sym:col[1], name:col[2]||col[1], members:col[3]||""});
+      else if(t==="試合") matches.push({no:col[1], time:col[2], home:col[3], away:col[4], hs:num(col[5]), as:num(col[6])});
+    }
+    render(teams, matches);
+    document.getElementById("err").textContent="";
+    document.getElementById("status").textContent = "最終更新: " + new Date().toLocaleTimeString("ja-JP");
+    document.getElementById("sub").textContent = "全" + matches.length + "試合 ・ " + teams.length + "チーム";
+  }catch(e){
+    document.getElementById("err").textContent = "⚠ " + e.message;
+    document.getElementById("sub").textContent = "エラー";
+  }
+}
+function teamName(teams, sym){ for(var i=0;i<teams.length;i++) if(teams[i].sym===sym) return teams[i].name; return sym; }
+
+function render(teams, matches){
+  var st={};
+  teams.forEach(function(t){ st[t.sym]={sym:t.sym,name:t.name,w:0,d:0,l:0,gf:0,ga:0}; });
+  matches.forEach(function(m){
+    if(m.hs==null||m.as==null) return;
+    if(!st[m.home]||!st[m.away]) return;
+    st[m.home].gf+=m.hs; st[m.home].ga+=m.as;
+    st[m.away].gf+=m.as; st[m.away].ga+=m.hs;
+    if(m.hs>m.as){ st[m.home].w++; st[m.away].l++; }
+    else if(m.hs<m.as){ st[m.away].w++; st[m.home].l++; }
+    else { st[m.home].d++; st[m.away].d++; }
+  });
+  var arr=Object.keys(st).map(function(k){
+    var x=st[k];
+    x.pts=x.w*SETTINGS.win + x.d*SETTINGS.draw + x.l*SETTINGS.loss;
+    x.gd=x.gf-x.ga; return x;
+  });
+  arr.sort(function(a,b){ return b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || a.sym.localeCompare(b.sym); });
+
+  document.getElementById("ruleNote").textContent =
+    "（勝ち点 勝" + SETTINGS.win + "/分" + SETTINGS.draw + "/負" + SETTINGS.loss + "）";
+
+  var h='<table><thead><tr><th class="rank">#</th><th class="name">チーム</th>'
+       +'<th>勝</th><th>分</th><th>負</th><th>得</th><th>失</th><th>差</th><th>勝点</th></tr></thead><tbody>';
+  arr.forEach(function(x,i){
+    h+='<tr><td class="rank">'+(i+1)+'</td>'
+      +'<td class="name"><span class="tag '+x.sym+'">'+esc(x.sym)+'</span> '+esc(x.name)+'</td>'
+      +'<td>'+x.w+'</td><td>'+x.d+'</td><td>'+x.l+'</td>'
+      +'<td>'+x.gf+'</td><td>'+x.ga+'</td><td>'+(x.gd>0?'+':'')+x.gd+'</td>'
+      +'<td class="pts">'+x.pts+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById("rankBox").innerHTML=h;
+
+  var m='<table><thead><tr><th>#</th><th>時刻</th><th class="name">対戦</th><th>スコア</th></tr></thead><tbody>';
+  matches.forEach(function(x){
+    var played=(x.hs!=null&&x.as!=null);
+    var hw=played&&x.hs>x.as, aw=played&&x.as>x.hs;
+    var score = played
+      ? '<span class="score '+(hw?'win':'')+'">'+x.hs+'</span><span class="vs">-</span><span class="score '+(aw?'win':'')+'">'+x.as+'</span>'
+      : '<span class="pending">未</span>';
+    m+='<tr><td>'+esc(x.no)+'</td><td>'+esc(x.time)+'</td>'
+      +'<td class="name"><span class="tag '+x.home+'">'+esc(x.home)+'</span> '
+      +esc(teamName(teams,x.home))+' <span class="vs">vs</span> '
+      +esc(teamName(teams,x.away))+' <span class="tag '+x.away+'">'+esc(x.away)+'</span></td>'
+      +'<td>'+score+'</td></tr>';
+  });
+  m+='</tbody></table>';
+  document.getElementById("matchBox").innerHTML=m;
+
+  var t='<table><thead><tr><th>記号</th><th class="name">チーム名</th><th class="name">メンバー</th></tr></thead><tbody>';
+  teams.forEach(function(x){
+    t+='<tr><td><span class="tag '+x.sym+'">'+esc(x.sym)+'</span></td>'
+      +'<td class="name">'+esc(x.name)+'</td>'
+      +'<td class="name members">'+esc(x.members||'—')+'</td></tr>';
+  });
+  t+='</tbody></table>';
+  document.getElementById("teamBox").innerHTML=t;
+}
+
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>
