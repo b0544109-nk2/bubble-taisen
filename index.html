@@ -112,7 +112,7 @@
   .foot{color:#6a5a2a;font-size:.76rem;text-align:center;margin-top:24px;line-height:1.7;font-weight:700}
   .err{color:var(--red);font-size:.88rem;white-space:pre-wrap;padding:6px 2px;font-weight:800}
   /* 結果ボタン */
-  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0 30px}
+  .actions{display:none;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0 30px}
   .act{font-family:inherit;font-weight:800;font-size:1rem;color:#fff;border:3px solid var(--ink);
     border-radius:14px;padding:12px 20px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
   .act:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
@@ -298,6 +298,8 @@ function render(teams, matches){
   });
   t+='</tbody></table>';
   document.getElementById("teamBox").innerHTML=t;
+  var _done=matches.length>0 && matches.every(function(mm){return mm.hs!=null&&mm.as!=null;});
+  var _act=document.querySelector(".actions"); if(_act) _act.style.display=_done?"flex":"none";
   LAST={teams:teams,matches:matches,standings:arr};
 }
 
