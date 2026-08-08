@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>#ゆるふわっばぶるさっかー 対戦表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#22252e;
@@ -16,7 +19,7 @@
   html,body{margin:0}
   body{
     color:var(--ink);min-height:100vh;
-    font-family:"Comic Sans MS","Chalkboard SE","Hiragino Maru Gothic ProN","Yu Gothic UI",system-ui,sans-serif;
+    font-family:"Kosugi Maru","Hiragino Maru Gothic ProN","Yu Gothic UI",system-ui,sans-serif;
     background-color:#fff3bf;
     background-image:
       radial-gradient(rgba(255,94,168,.16) 2.5px, transparent 2.6px),
@@ -58,6 +61,7 @@
     border-radius:999px;padding:5px 16px;font-weight:800;font-size:.8rem;letter-spacing:.06em;
     box-shadow:3px 3px 0 var(--ink);transform:rotate(-2deg);margin-bottom:16px}
   h1{margin:0;line-height:1.15}
+  .h1-main,.h1-sub,.card>h2,.act,.mpills button,.mtitle,.mclose,.pts,.score,.rank .medal{font-family:"Mochiy Pop One","Kosugi Maru",sans-serif}
   .h1-main{display:inline-block;background:var(--pink);color:#fff;border:4px solid var(--ink);
     border-radius:16px;padding:10px 18px;font-size:clamp(1.35rem,5.6vw,2.15rem);font-weight:800;
     box-shadow:6px 6px 0 var(--ink);transform:rotate(-1.5deg);
@@ -356,24 +360,24 @@ function buildCanvas(sym){
   for(var gy=24;gy<H;gy+=50){ for(var gx=((((gy/50)|0)%2)?49:24);gx<W;gx+=50){ x.beginPath(); x.arc(gx,gy,4,0,7); x.fill(); } }
   var m=56; rr(x,m,m,W-2*m,H-2*m,40); x.fillStyle="#fff"; x.fill(); x.lineWidth=10; x.strokeStyle="#22252e"; x.stroke();
   var cx=W/2; x.textAlign="center"; x.fillStyle="#22252e";
-  x.font='bold 34px "Yu Gothic UI","Hiragino Maru Gothic ProN",sans-serif'; x.fillText("#ゆるふわっばぶるさっかー",cx,146);
-  x.font='bold 66px "Yu Gothic UI","Hiragino Maru Gothic ProN",sans-serif'; x.fillText("結果発表！🎉",cx,228);
+  x.font='bold 34px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("#ゆるふわっばぶるさっかー",cx,146);
+  x.font='bold 66px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("結果発表！🎉",cx,228);
   var nm=teamName(LAST.teams,sym); var label=sym+(nm?(":"+nm):""); var col=TEAMCOLOR[sym]||"#22252e";
-  x.font='bold 52px "Yu Gothic UI",sans-serif'; var tw=x.measureText(label).width; var pw=tw+80,ph=88,px=cx-pw/2,py=278;
+  x.font='bold 52px "Mochiy Pop One","Kosugi Maru",sans-serif'; var tw=x.measureText(label).width; var pw=tw+80,ph=88,px=cx-pw/2,py=278;
   rr(x,px,py,pw,ph,44); x.fillStyle=col; x.fill(); x.lineWidth=8; x.strokeStyle="#22252e"; x.stroke();
   x.fillStyle="#fff"; x.textBaseline="middle"; x.fillText(label,cx,py+ph/2+2); x.textBaseline="alphabetic";
   var s=findStanding(sym); var medal=s.rank<=3?["🥇","🥈","🥉"][s.rank-1]:"";
-  x.fillStyle="#22252e"; x.font='bold 92px "Yu Gothic UI",sans-serif'; x.fillText(medal+" "+s.rank+"位",cx,478);
-  x.font='bold 34px "Yu Gothic UI",sans-serif'; x.fillStyle="#6a5a2a"; x.fillText("全"+LAST.standings.length+"チーム中",cx,522);
-  x.fillStyle="#22252e"; x.font='bold 42px "Yu Gothic UI",sans-serif'; x.fillText("勝 "+s.w+"   分 "+s.d+"   負 "+s.l,cx,592);
-  x.fillStyle="#e8503f"; x.font='bold 46px "Yu Gothic UI",sans-serif'; x.fillText("勝点 "+s.pts+"  ／  得失差 "+(s.gd>0?"+":"")+s.gd,cx,652);
+  x.fillStyle="#22252e"; x.font='bold 92px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(medal+" "+s.rank+"位",cx,478);
+  x.font='bold 34px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillStyle="#6a5a2a"; x.fillText("全"+LAST.standings.length+"チーム中",cx,522);
+  x.fillStyle="#22252e"; x.font='bold 42px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("勝 "+s.w+"   分 "+s.d+"   負 "+s.l,cx,592);
+  x.fillStyle="#e8503f"; x.font='bold 46px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText("勝点 "+s.pts+"  ／  得失差 "+(s.gd>0?"+":"")+s.gd,cx,652);
   // 勝敗表
-  x.textAlign="center"; x.fillStyle="#22252e"; x.font='bold 40px "Yu Gothic UI",sans-serif';
+  x.textAlign="center"; x.fillStyle="#22252e"; x.font='bold 40px "Mochiy Pop One","Kosugi Maru",sans-serif';
   x.fillText("🏅 勝敗表",cx,700);
   var colR=118,colTeam=168,colW=558,colD=632,colL=706,colP=832;
   var headerY=752, firstCy=808, rh=66;
   x.textBaseline="middle";
-  x.font='bold 26px "Yu Gothic UI",sans-serif'; x.fillStyle="#6a5a2a";
+  x.font='bold 26px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillStyle="#6a5a2a";
   x.textAlign="center"; x.fillText("順位",colR,headerY);
   x.textAlign="left"; x.fillText("チーム",colTeam,headerY);
   x.textAlign="center"; x.fillText("勝",colW,headerY); x.fillText("分",colD,headerY); x.fillText("負",colL,headerY); x.fillText("勝点",colP,headerY);
@@ -382,24 +386,26 @@ function buildCanvas(sym){
     var cy=firstCy+i*rh;
     if(tt.sym===sym){ x.fillStyle="#fff2c0"; rr(x,88,cy-rh/2+3,824,rh-6,10); x.fill(); }
     var med = i<3 ? ["🥇","🥈","🥉"][i] : String(i+1);
-    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Yu Gothic UI",sans-serif'; x.fillText(med,colR,cy);
+    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(med,colR,cy);
     var nm2=teamName(LAST.teams,tt.sym); var lbl=tt.sym+(nm2?(":"+nm2):"");
-    x.font='bold 26px "Yu Gothic UI",sans-serif'; var pw=Math.min(372,x.measureText(lbl).width+26);
+    x.font='bold 26px "Mochiy Pop One","Kosugi Maru",sans-serif'; var pw=Math.min(372,x.measureText(lbl).width+26);
     rr(x,colTeam,cy-22,pw,44,22); x.fillStyle=TEAMCOLOR[tt.sym]||"#22252e"; x.fill(); x.lineWidth=3; x.strokeStyle="#22252e"; x.stroke();
     x.fillStyle="#fff"; x.textAlign="center"; x.fillText(lbl,colTeam+pw/2,cy+1);
-    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Yu Gothic UI",sans-serif';
+    x.fillStyle="#22252e"; x.textAlign="center"; x.font='bold 30px "Mochiy Pop One","Kosugi Maru",sans-serif';
     x.fillText(String(tt.w),colW,cy); x.fillText(String(tt.d),colD,cy); x.fillText(String(tt.l),colL,cy);
-    x.fillStyle="#e8503f"; x.font='bold 32px "Yu Gothic UI",sans-serif'; x.fillText(String(tt.pts),colP,cy);
+    x.fillStyle="#e8503f"; x.font='bold 32px "Mochiy Pop One","Kosugi Maru",sans-serif'; x.fillText(String(tt.pts),colP,cy);
     x.strokeStyle="#efe3b0"; x.lineWidth=2; x.beginPath(); x.moveTo(90,cy+rh/2); x.lineTo(910,cy+rh/2); x.stroke();
   });
   x.textBaseline="alphabetic";
-  x.textAlign="center"; x.fillStyle="#8a7a3a"; x.font='bold 26px "Yu Gothic UI",sans-serif';
+  x.textAlign="center"; x.fillStyle="#8a7a3a"; x.font='bold 26px "Mochiy Pop One","Kosugi Maru",sans-serif';
   x.fillText("#ゆるふわっばぶるさっかー ⚽🫧", cx, 1132);
   return cv;
 }
-function downloadImage(sym){
-  try{ var cv=buildCanvas(sym); var url=cv.toDataURL("image/png"); var a=document.createElement("a"); a.href=url; a.download="bubblesoccer_"+sym+".png"; document.body.appendChild(a); a.click(); a.remove(); }
-  catch(e){ toast("画像の保存に失敗しました"); }
+async function downloadImage(sym){
+  try{
+    if(document.fonts){ try{ await document.fonts.load('400 40px "Mochiy Pop One"'); await document.fonts.load('400 30px "Kosugi Maru"'); await document.fonts.ready; }catch(e){} }
+    var cv=buildCanvas(sym); var url=cv.toDataURL("image/png"); var a=document.createElement("a"); a.href=url; a.download="bubblesoccer_"+sym+".png"; document.body.appendChild(a); a.click(); a.remove();
+  }catch(e){ toast("画像の保存に失敗しました"); }
 }
 document.getElementById("btnSave").addEventListener("click",function(){startAction("save");});
 document.getElementById("btnTweet").addEventListener("click",function(){startAction("tweet");});
