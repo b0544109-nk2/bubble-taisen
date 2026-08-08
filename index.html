@@ -31,8 +31,8 @@
   tbody tr:hover{background:var(--rowhi)}
   .rank{font-weight:700;width:2.2em}
   .pts{font-weight:800;color:var(--accent2)}
-  .tag{display:inline-block;min-width:1.6em;height:1.6em;line-height:1.6em;border-radius:6px;
-       font-weight:800;color:#fff;font-size:.82rem;text-align:center;padding:0 .3em}
+  .tag{display:inline-block;border-radius:6px;font-weight:800;color:#fff;font-size:.82rem;
+       text-align:center;padding:2px 8px;white-space:nowrap}
   .A{background:#e5484d}.B{background:#3b82f6}.C{background:#d9a400}
   .D{background:#22a06b}.E{background:#8b5cf6}
   .score{font-weight:800;font-size:1rem}
@@ -98,6 +98,8 @@ function parseCSV(text){
 }
 function num(v){ v=(v==null?"":String(v)).trim(); if(v==="") return null; var n=Number(v); return isNaN(n)?null:n; }
 function esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+// 記号：チーム名 を色付きピルで表示
+function pill(sym,name){ return '<span class="tag '+esc(sym)+'">'+esc(sym)+'：'+esc(name)+'</span>'; }
 
 async function load(){
   try{
@@ -153,7 +155,7 @@ function render(teams, matches){
        +'<th>勝</th><th>分</th><th>負</th><th>得</th><th>失</th><th>差</th><th>勝点</th></tr></thead><tbody>';
   arr.forEach(function(x,i){
     h+='<tr><td class="rank">'+(i+1)+'</td>'
-      +'<td class="name"><span class="tag '+x.sym+'">'+esc(x.sym)+'</span> '+esc(x.name)+'</td>'
+      +'<td class="name">'+pill(x.sym,x.name)+'</td>'
       +'<td>'+x.w+'</td><td>'+x.d+'</td><td>'+x.l+'</td>'
       +'<td>'+x.gf+'</td><td>'+x.ga+'</td><td>'+(x.gd>0?'+':'')+x.gd+'</td>'
       +'<td class="pts">'+x.pts+'</td></tr>';
@@ -169,18 +171,15 @@ function render(teams, matches){
       ? '<span class="score '+(hw?'win':'')+'">'+x.hs+'</span><span class="vs">-</span><span class="score '+(aw?'win':'')+'">'+x.as+'</span>'
       : '<span class="pending">未</span>';
     m+='<tr><td>'+esc(x.no)+'</td><td>'+esc(x.time)+'</td>'
-      +'<td class="name"><span class="tag '+x.home+'">'+esc(x.home)+'</span> '
-      +esc(teamName(teams,x.home))+' <span class="vs">vs</span> '
-      +esc(teamName(teams,x.away))+' <span class="tag '+x.away+'">'+esc(x.away)+'</span></td>'
+      +'<td class="name">'+pill(x.home,teamName(teams,x.home))+' <span class="vs">vs</span> '+pill(x.away,teamName(teams,x.away))+'</td>'
       +'<td>'+score+'</td></tr>';
   });
   m+='</tbody></table>';
   document.getElementById("matchBox").innerHTML=m;
 
-  var t='<table><thead><tr><th>記号</th><th class="name">チーム名</th><th class="name">メンバー</th></tr></thead><tbody>';
+  var t='<table><thead><tr><th class="name">チーム</th><th class="name">メンバー</th></tr></thead><tbody>';
   teams.forEach(function(x){
-    t+='<tr><td><span class="tag '+x.sym+'">'+esc(x.sym)+'</span></td>'
-      +'<td class="name">'+esc(x.name)+'</td>'
+    t+='<tr><td class="name">'+pill(x.sym,x.name)+'</td>'
       +'<td class="name members">'+esc(x.members||'—')+'</td></tr>';
   });
   t+='</tbody></table>';
