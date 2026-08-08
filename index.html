@@ -51,9 +51,9 @@
   .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:30px 15px 70px}
 
   /* ヘッダー */
-  header{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:14px 0 4px;text-align:center}
-  .titlewrap{flex:0 1 auto}
-  .titleimg{flex:none;width:clamp(84px,22vw,132px);filter:drop-shadow(3px 4px 0 rgba(0,0,0,.10))}
+  header{margin:16px 0 2px;text-align:center}
+  .herostrip{display:flex;justify-content:center;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:14px 0 2px}
+  .herostrip img{height:clamp(58px,16vw,90px);width:auto;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.10))}
   .kicker{display:inline-block;background:var(--cyan);color:#fff;border:3px solid var(--ink);
     border-radius:999px;padding:5px 16px;font-weight:800;font-size:.8rem;letter-spacing:.06em;
     box-shadow:3px 3px 0 var(--ink);transform:rotate(-2deg);margin-bottom:16px}
@@ -111,6 +111,23 @@
   .status{text-align:right;color:#8a7a3a;font-size:.74rem;margin-top:10px;font-weight:700}
   .foot{color:#6a5a2a;font-size:.76rem;text-align:center;margin-top:24px;line-height:1.7;font-weight:700}
   .err{color:var(--red);font-size:.88rem;white-space:pre-wrap;padding:6px 2px;font-weight:800}
+  /* 結果ボタン */
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0 30px}
+  .act{font-family:inherit;font-weight:800;font-size:1rem;color:#fff;border:3px solid var(--ink);
+    border-radius:14px;padding:12px 20px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+  .act:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+  .act.save{background:var(--green)}
+  .act.tweet{background:#1d9bf0}
+  .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(34,37,46,.5)}
+  .overlay.show{display:flex}
+  .modal{background:#fff;border:4px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--ink);max-width:360px;width:100%;padding:24px 22px;text-align:center}
+  .mtitle{font-weight:800;font-size:1.15rem;margin-bottom:16px}
+  .mpills{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+  .mpills button{font-family:inherit;font-weight:800;font-size:1.05rem;color:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);text-shadow:1px 1px 0 rgba(0,0,0,.2)}
+  .mpills button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .mclose{font-family:inherit;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px 18px;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+  #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:60;background:var(--ink);color:#fff;font-weight:800;font-size:.9rem;padding:12px 20px;border-radius:999px;box-shadow:4px 4px 0 rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -123,17 +140,23 @@
 <img class="imgdeco b4" src="images/sport_soccerball.png" alt="" aria-hidden="true">
 <div class="wrap">
   <header>
-    <div class="titlewrap">
-      <h1><span class="h1-main">#ゆるふわっばぶるさっかー</span></h1>
-      <div><span class="h1-sub">対 戦 表</span></div>
-    </div>
-    <img class="titleimg" src="images/sports_bubble_soccer.png" alt="バブルサッカー">
+    <h1><span class="h1-main">#ゆるふわっばぶるさっかー</span></h1>
+    <div><span class="h1-sub">対 戦 表</span></div>
   </header>
-  <div class="meta" id="sub">読み込み中…</div>
+  <div class="herostrip">
+    <img src="images/syabondama.png" alt="" aria-hidden="true">
+    <img src="images/sports_bubble_soccer.png" alt="バブルサッカー">
+    <img src="images/sport_soccerball.png" alt="" aria-hidden="true">
+  </div>
+  <div class="meta" id="sub"></div>
 
   <section class="card" data-emoji="🏆">
     <h2>🏆 順位</h2><span class="rule" id="ruleNote"></span>
     <div class="tblwrap" id="rankBox"><div class="err" id="err"></div></div>
+    <div class="actions">
+      <button class="act save" id="btnSave">📸 結果を保存</button>
+      <button class="act tweet" id="btnTweet">🐦 結果をツイート</button>
+    </div>
   </section>
 
   <section class="card" data-emoji="⚽">
@@ -149,6 +172,8 @@
   <div class="status" id="status"></div>
   <img class="cheer" src="images/soccer_supporter_man.png" alt="がんばれ！">
 </div>
+<div class="overlay" id="ovl"><div class="modal"><div class="mtitle">あなたのチームは？🫧</div><div class="mpills" id="mpills"></div><button class="mclose" id="mclose">とじる</button></div></div>
+<div id="toast"></div>
 
 <script>
 // ?id=スプレッドシートID を付ければ別シートも表示できます。
@@ -157,6 +182,9 @@ var params = new URLSearchParams(location.search);
 var SHEET_ID = params.get("id") || DEFAULT_ID;
 var GVIZ = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv";
 var SETTINGS = { win:3, draw:1, loss:0 };
+var LAST = { teams:[], matches:[], standings:[] };
+var TEAMCOLOR = { A:"#e8503f", B:"#2f4bd8", C:"#f28c28", D:"#2fae44", E:"#20242f" };
+var pendingAct = null;
 
 function parseCSV(text){
   var rows=[], row=[], cur="", i=0, q=false, c;
@@ -270,10 +298,85 @@ function render(teams, matches){
   });
   t+='</tbody></table>';
   document.getElementById("teamBox").innerHTML=t;
+  LAST={teams:teams,matches:matches,standings:arr};
 }
 
 load();
 setInterval(load, 30000);
+
+// ===== 結果の保存 / ツイート =====
+var toastT=null;
+function toast(msg){ var el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){el.classList.remove("show");},3200); }
+function allFinished(){ return LAST.matches.length>0 && LAST.matches.every(function(m){return m.hs!=null&&m.as!=null;}); }
+function remaining(){ return LAST.matches.filter(function(m){return m.hs==null||m.as==null;}).length; }
+function findStanding(sym){ for(var i=0;i<LAST.standings.length;i++){ if(LAST.standings[i].sym===sym){ var x=LAST.standings[i]; return {rank:i+1,w:x.w,d:x.d,l:x.l,pts:x.pts,gd:x.gd,gf:x.gf,ga:x.ga}; } } return null; }
+
+function startAction(act){
+  if(!LAST.teams.length){ toast("データ読み込み中です…"); return; }
+  if(!allFinished()){ toast("全試合が終わってから使えます（あと"+remaining()+"試合）🙏"); return; }
+  pendingAct=act; openSelect();
+}
+function openSelect(){
+  var box=document.getElementById("mpills"); box.innerHTML="";
+  LAST.teams.forEach(function(tm){
+    var b=document.createElement("button");
+    b.textContent=tm.sym+(tm.name?(" "+tm.name):"");
+    b.style.background=TEAMCOLOR[tm.sym]||"#22252e";
+    b.onclick=function(){ closeSelect(); doAction(tm.sym); };
+    box.appendChild(b);
+  });
+  document.getElementById("ovl").classList.add("show");
+}
+function closeSelect(){ document.getElementById("ovl").classList.remove("show"); }
+function doAction(sym){
+  if(pendingAct==="save"){ downloadImage(sym); toast("結果画像を保存しました📸"); }
+  else if(pendingAct==="tweet"){ downloadImage(sym); openTweet(sym); toast("画像も保存！ツイートに添付してね🐦"); }
+}
+function openTweet(sym){
+  var s=findStanding(sym); if(!s) return;
+  var nm=teamName(LAST.teams,sym); var label=sym+(nm?(" "+nm):"");
+  var medal=s.rank<=3?["🥇","🥈","🥉"][s.rank-1]:"";
+  var text="【#ゆるふわっばぶるさっかー】\n"+label+" は "+s.rank+"位！"+medal+"\n勝"+s.w+" 分"+s.d+" 負"+s.l+"（勝点"+s.pts+"）⚽🫧";
+  window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(text),"_blank","noopener");
+}
+function rr(x,rx,ry,w,h,r){ if(x.roundRect){x.beginPath();x.roundRect(rx,ry,w,h,r);return;} x.beginPath();x.moveTo(rx+r,ry);x.arcTo(rx+w,ry,rx+w,ry+h,r);x.arcTo(rx+w,ry+h,rx,ry+h,r);x.arcTo(rx,ry+h,rx,ry,r);x.arcTo(rx,ry,rx+w,ry,r);x.closePath(); }
+function buildCanvas(sym){
+  var W=1000,H=1000, cv=document.createElement("canvas"); cv.width=W; cv.height=H; var x=cv.getContext("2d");
+  x.fillStyle="#fff3bf"; x.fillRect(0,0,W,H);
+  x.fillStyle="rgba(51,196,255,.18)";
+  for(var gy=24;gy<H;gy+=50){ for(var gx=((((gy/50)|0)%2)?49:24);gx<W;gx+=50){ x.beginPath(); x.arc(gx,gy,4,0,7); x.fill(); } }
+  var m=56; rr(x,m,m,W-2*m,H-2*m,40); x.fillStyle="#fff"; x.fill(); x.lineWidth=10; x.strokeStyle="#22252e"; x.stroke();
+  var cx=W/2; x.textAlign="center"; x.fillStyle="#22252e";
+  x.font='bold 34px "Yu Gothic UI","Hiragino Maru Gothic ProN",sans-serif'; x.fillText("#ゆるふわっばぶるさっかー",cx,146);
+  x.font='bold 66px "Yu Gothic UI","Hiragino Maru Gothic ProN",sans-serif'; x.fillText("結果発表！🎉",cx,228);
+  var nm=teamName(LAST.teams,sym); var label=sym+(nm?(" "+nm):""); var col=TEAMCOLOR[sym]||"#22252e";
+  x.font='bold 52px "Yu Gothic UI",sans-serif'; var tw=x.measureText(label).width; var pw=tw+80,ph=88,px=cx-pw/2,py=278;
+  rr(x,px,py,pw,ph,44); x.fillStyle=col; x.fill(); x.lineWidth=8; x.strokeStyle="#22252e"; x.stroke();
+  x.fillStyle="#fff"; x.textBaseline="middle"; x.fillText(label,cx,py+ph/2+2); x.textBaseline="alphabetic";
+  var s=findStanding(sym); var medal=s.rank<=3?["🥇","🥈","🥉"][s.rank-1]:"";
+  x.fillStyle="#22252e"; x.font='bold 92px "Yu Gothic UI",sans-serif'; x.fillText(medal+" "+s.rank+"位",cx,478);
+  x.font='bold 34px "Yu Gothic UI",sans-serif'; x.fillStyle="#6a5a2a"; x.fillText("全"+LAST.standings.length+"チーム中",cx,522);
+  x.fillStyle="#22252e"; x.font='bold 42px "Yu Gothic UI",sans-serif'; x.fillText("勝 "+s.w+"   分 "+s.d+"   負 "+s.l,cx,592);
+  x.fillStyle="#e8503f"; x.font='bold 46px "Yu Gothic UI",sans-serif'; x.fillText("勝点 "+s.pts+"  ／  得失差 "+(s.gd>0?"+":"")+s.gd,cx,652);
+  x.textAlign="left"; var ly=724, lx=150;
+  LAST.standings.forEach(function(tt,i){
+    var yy=ly+i*46;
+    x.fillStyle=TEAMCOLOR[tt.sym]||"#22252e"; rr(x,lx,yy-26,42,36,10); x.fill(); x.lineWidth=4; x.strokeStyle="#22252e"; x.stroke();
+    x.fillStyle="#fff"; x.textAlign="center"; x.font="bold 24px sans-serif"; x.fillText(tt.sym,lx+21,yy);
+    x.textAlign="left"; x.fillStyle="#22252e"; x.font='bold 28px "Yu Gothic UI",sans-serif';
+    var nm2=teamName(LAST.teams,tt.sym);
+    x.fillText((i+1)+"位  "+tt.sym+(nm2?(" "+nm2):"")+"   勝点"+tt.pts, lx+60, yy);
+  });
+  return cv;
+}
+function downloadImage(sym){
+  try{ var cv=buildCanvas(sym); var url=cv.toDataURL("image/png"); var a=document.createElement("a"); a.href=url; a.download="bubblesoccer_"+sym+".png"; document.body.appendChild(a); a.click(); a.remove(); }
+  catch(e){ toast("画像の保存に失敗しました"); }
+}
+document.getElementById("btnSave").addEventListener("click",function(){startAction("save");});
+document.getElementById("btnTweet").addEventListener("click",function(){startAction("tweet");});
+document.getElementById("mclose").addEventListener("click",closeSelect);
+document.getElementById("ovl").addEventListener("click",function(e){ if(e.target.id==="ovl") closeSelect(); });
 </script>
 </body>
 </html>
