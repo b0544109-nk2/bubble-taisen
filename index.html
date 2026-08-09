@@ -111,6 +111,12 @@
   .vs{color:#c9a94a;font-size:.8rem;padding:0 8px;font-weight:800}
   .pending{color:#b0a05a;font-size:.82rem;border:2px dashed var(--line);border-radius:8px;padding:2px 9px;font-weight:800}
   .win{color:var(--red)}
+  .league td,.league th{border:1.5px solid var(--line);padding:8px 6px;font-weight:800;white-space:nowrap}
+  .league .diag{background:#f2ead0;color:#cbbb86}
+  .league .lw{background:#e4f7ea;color:#2aa84a}
+  .league .ll{background:#ffe8e4;color:#e8503f}
+  .league .ld{background:#eef0f4;color:#7a808f}
+  .league .lpend{color:#cbbb86;font-weight:700}
 
   .members{color:#6a5a2a;font-size:.84rem;font-weight:700}
   .status{text-align:right;color:#8a7a3a;font-size:.74rem;margin-top:10px;font-weight:700}
@@ -169,6 +175,11 @@
       <button class="act save" id="btnSave">📸 結果を保存</button>
       <button class="act tweet" id="btnTweet">🐦 結果をツイート</button>
     </div>
+  </section>
+
+  <section class="card" data-emoji="📋">
+    <h2>📋 リーグ戦表</h2>
+    <div class="tblwrap" id="leagueBox"></div>
   </section>
 
   <section class="card" data-emoji="⚽">
@@ -253,6 +264,28 @@ async function load(){
   }
 }
 function teamName(teams, sym){ for(var i=0;i<teams.length;i++) if(teams[i].sym===sym) return teams[i].name; return sym; }
+function findMatch(matches,a,b){ for(var i=0;i<matches.length;i++){ var m=matches[i]; if((m.home===a&&m.away===b)||(m.home===b&&m.away===a)) return m; } return null; }
+function renderLeague(teams, matches, st, arr){
+  var rank={}; arr.forEach(function(x,i){ rank[x.sym]=i+1; });
+  var h='<table class="league"><thead><tr><th class="name">＼</th>';
+  teams.forEach(function(tm){ h+='<th>'+pill(tm.sym,"")+'</th>'; });
+  h+='<th>勝点</th><th>順位</th></tr></thead><tbody>';
+  teams.forEach(function(rt){
+    h+='<tr><th class="name">'+pill(rt.sym,teamName(teams,rt.sym))+'</th>';
+    teams.forEach(function(ct){
+      if(rt.sym===ct.sym){ h+='<td class="diag">—</td>'; return; }
+      var m=findMatch(matches,rt.sym,ct.sym);
+      if(!m||m.hs==null||m.as==null){ h+='<td class="lpend">-</td>'; return; }
+      var rs,cs; if(m.home===rt.sym){ rs=m.hs; cs=m.as; } else { rs=m.as; cs=m.hs; }
+      var cls=rs>cs?'lw':(rs<cs?'ll':'ld');
+      h+='<td class="'+cls+'">'+rs+'-'+cs+'</td>';
+    });
+    var s=st[rt.sym];
+    h+='<td class="pts">'+(s?s.pts:0)+'</td><td class="rank">'+(rank[rt.sym]||'-')+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  var el=document.getElementById("leagueBox"); if(el) el.innerHTML=h;
+}
 
 function render(teams, matches){
   var st={};
@@ -313,6 +346,7 @@ function render(teams, matches){
   });
   t+='</tbody></table>';
   document.getElementById("teamBox").innerHTML=t;
+  renderLeague(teams, matches, st, arr);
   var _done=matches.length>0 && matches.every(function(mm){return mm.hs!=null&&mm.as!=null;});
   var _act=document.querySelector(".actions"); if(_act) _act.style.display=_done?"flex":"none";
   LAST={teams:teams,matches:matches,standings:arr};
