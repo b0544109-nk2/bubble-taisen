@@ -172,6 +172,7 @@
     <h2>🏆 順位</h2><span class="rule" id="ruleNote"></span>
     <div class="tblwrap" id="rankBox"><div class="err" id="err"></div></div>
     <div class="actions">
+      <button class="act save" id="btnSave">📸 結果を保存</button>
       <button class="act tweet" id="btnTweet">🐦 結果をツイート</button>
     </div>
   </section>
@@ -379,7 +380,8 @@ function openSelect(){
 }
 function closeSelect(){ document.getElementById("ovl").classList.remove("show"); }
 function doAction(sym){
-  openTweet(sym); toast("ツイート画面を開きました🐦");
+  if(pendingAct==="save"){ downloadImage(sym); toast("結果画像を保存しました📸"); }
+  else { downloadImage(sym); openTweet(sym); toast("画像も保存！ツイートに添付してね🐦"); }
 }
 function openTweet(sym){
   var s=findStanding(sym); if(!s) return;
@@ -440,9 +442,12 @@ function buildCanvas(sym){
 async function downloadImage(sym){
   try{
     if(document.fonts){ try{ await document.fonts.load('64px "Mochiy Pop One"'); await document.fonts.load('28px "Mochiy Pop One"'); await document.fonts.ready; }catch(e){} }
-    var cv=buildCanvas(sym); var url=cv.toDataURL("image/png"); var a=document.createElement("a"); a.href=url; a.download="bubblesoccer_"+sym+".png"; document.body.appendChild(a); a.click(); a.remove();
+    var _nm=teamName(LAST.teams,sym); var _s2=findStanding(sym);
+    var _fn="バブルサッカー結果_"+sym+(_nm?("_"+_nm):"")+(_s2?("_"+_s2.rank+"位"):"")+".png";
+    var cv=buildCanvas(sym); var url=cv.toDataURL("image/png"); var a=document.createElement("a"); a.href=url; a.download=_fn; document.body.appendChild(a); a.click(); a.remove();
   }catch(e){ toast("画像の保存に失敗しました"); }
 }
+document.getElementById("btnSave").addEventListener("click",function(){startAction("save");});
 document.getElementById("btnTweet").addEventListener("click",function(){startAction("tweet");});
 document.getElementById("mclose").addEventListener("click",closeSelect);
 document.getElementById("ovl").addEventListener("click",function(e){ if(e.target.id==="ovl") closeSelect(); });
