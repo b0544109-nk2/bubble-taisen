@@ -368,15 +368,33 @@ function startAction(act){
   pendingAct=act; openSelect();
 }
 function openSelect(){
+  var title=document.querySelector(".mtitle");
+  if(title) title.textContent = (pendingAct==="save") ? "保存するチームを選択📸" : "あなたのチームは？🫧";
   var box=document.getElementById("mpills"); box.innerHTML="";
+  if(pendingAct==="save"){
+    var all=document.createElement("button");
+    all.textContent="⬇️ 全チームまとめて保存";
+    all.style.background="#2aa84a"; all.style.color="#fff";
+    all.onclick=function(){ downloadAll(); };
+    box.appendChild(all);
+  }
   LAST.teams.forEach(function(tm){
     var b=document.createElement("button");
-    b.textContent=tm.sym+(tm.name?(" "+tm.name):"");
+    b.textContent=tm.sym+(tm.name?(":"+tm.name):"");
     b.style.background=TEAMCOLOR[tm.sym]||"#22252e";
+    b.style.color=TEXTCOLOR[tm.sym]||"#fff";
     b.onclick=function(){ closeSelect(); doAction(tm.sym); };
     box.appendChild(b);
   });
   document.getElementById("ovl").classList.add("show");
+}
+async function downloadAll(){
+  closeSelect();
+  for(var i=0;i<LAST.teams.length;i++){
+    await downloadImage(LAST.teams[i].sym);
+    await new Promise(function(r){ setTimeout(r,450); });
+  }
+  toast("全チームの画像を保存しました📸");
 }
 function closeSelect(){ document.getElementById("ovl").classList.remove("show"); }
 function doAction(sym){
