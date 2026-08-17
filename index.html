@@ -129,6 +129,10 @@
   .act:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
   .act.save{background:var(--green)}
   .act.tweet{background:#1d9bf0}
+  /* ひまつぶしゲームへの導線（.actions は結果が出るまで非表示なので別クラスにする） */
+  .gameactions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
+  .act.game{background:var(--purple);text-decoration:none;display:inline-block}
+  .gamenote{text-align:center;font-size:.85rem;color:#6a5a2a;font-weight:700;line-height:1.7}
   .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(34,37,46,.5)}
   .overlay.show{display:flex}
   .modal{background:#fff;border:4px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--ink);max-width:360px;width:100%;padding:24px 22px;text-align:center}
@@ -190,6 +194,17 @@
   <section class="card" data-emoji="🫧">
     <h2>👥 チーム</h2>
     <div class="tblwrap" id="teamBox"></div>
+  </section>
+
+  <section class="card" data-emoji="🎮">
+    <h2>🎮 ひまつぶし</h2>
+    <div class="gamenote">
+      出番待ちのあいだに。1ボタンのドット絵ゲーム「バブルバウンド」🫧<br>
+      じぶんのバブルの色をえらんで、どこまで走れるか競おう！
+    </div>
+    <div class="gameactions">
+      <a class="act game" href="game.html" target="_blank" rel="noopener">▶ バブルバウンドで あそぶ</a>
+    </div>
   </section>
 
   <div class="status" id="status"></div>
